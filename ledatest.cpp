@@ -111,9 +111,36 @@ bool my_bipartite_checker(const graph &G, list<node> &V1, list<node> &V2)
 
         if ((ex[G.target(e)] && ex[G.source(e)]) && (ex[G.target(e)] == ex[G.source(e)]))
         {
-            node temp = G.target(e);
+            node temp = G.source(e);
+            while(temp!=s)
+            {
+                if(pred[temp] && G.source(pred[temp])!=s)
+                {
+                    V1.append(temp);
+                    temp = G.source(pred[temp]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            temp = G.target(e);
             is_bipartite = false;
-
+            while(temp != s)
+            { 
+                if(pred[temp])
+                {
+                    V1.append(temp);
+                    temp = G.source(pred[temp]);
+                    
+                }
+                else
+                {
+                    break;
+                }
+            }
+            
+            /*
             while ((temp != s))
             {
 
@@ -175,7 +202,7 @@ bool my_bipartite_checker(const graph &G, list<node> &V1, list<node> &V2)
                     std::cout << "pred[temp] does not exist";
                     break;
                 }
-            }
+            }*/
             break;
         }
     }
@@ -201,7 +228,7 @@ int main()
 {
     graph G;
     edge e;
-    circle_graph(101,G);
+    circle_graph(51,G);
     forall_edges(e,G)
     {
         G.print_edge(e);
@@ -230,7 +257,7 @@ int main()
     timer a;
     timer b;
     a.start();
-    //bool isBipartite = Is_Bipartite(G, A, B);
+    bool isBipartite = Is_Bipartite(G, A, B);
     a.stop();
     //std::cout << isBipartite << "\n";
 
@@ -248,7 +275,7 @@ int main()
     }
     //std::cout << "created graph";
     b.start();
-    bool isBipartite = my_bipartite_checker(G, V1, V2);
+    isBipartite = my_bipartite_checker(G, V1, V2);
     b.stop();
     std::cout << "Time b:" << b.elapsed_time() << "\n";
     std::cout << isBipartite << "\n";
