@@ -6,12 +6,12 @@ CC = g++
 CFLAGS = -std=c++0x -O3
 LIBFLAGS = -lleda -lm
 
-LedaLibs = '/home/raven/Documents/algo/LEDA/incl'
-Leda = '/home/raven/Documents/algo/LEDA'
+Leda = '/usr/local/LEDA/incl'
+LedaLibs = '/usr/local/LEDA'
 
 all: $(name)
 $(name): $(obj)
-	$(CC) $(CFLAGS) -o $@ $^ -I$(LedaLibs) -L$(Leda) $(LIBFLAGS)
+	$(CC) $(CFLAGS) -o $@ $^ -I$(Leda) -L$(LedaLibs) $(LIBFLAGS)
 
 run:
 	./$(name)

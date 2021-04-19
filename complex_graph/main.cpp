@@ -5,10 +5,10 @@
 
 using namespace leda;
 using namespace std;
-int main(){
-	graph G;
+
+void create_complex_graph( int k, graph& G){
 	srand (time(NULL));
-	int k = 5;
+	
 
 	node L1[k];
 	node L2[k];
@@ -46,30 +46,46 @@ int main(){
 		G.new_edge(L3[random_node],L4[i]); G.new_edge(L4[i],L3[random_node]); 
 	}
 		
+	int random_L1 = rand() % k;
+	int random_L2 = rand() % k;
+	int random_L3 = rand() % k;
+	int random_L4 = rand() % k;
+
+
 
 	// Connecting L1-L3 and L2-L4 with one edge.
-	G.new_edge(L1[rand() % k],L3[rand() % k]); G.new_edge(L2[rand() % k],L4[rand() % k]); 
+	G.new_edge(L1[random_L1],L3[random_L3]); G.new_edge(L3[random_L3],L1[random_L1]);
+	G.new_edge(L2[random_L2],L4[random_L4]); G.new_edge(L4[random_L4],L2[random_L2]); 
 
-	
-	
+	// edge e;
+	// forall_edges(e,G) {
+	// 	G.print_edge(e);
+	// 	std::cout<<"\n";
+	// }
 
-
-
-
-
-
-
-
-
-
-	
-	/*forall_edges(e,G) {
-		G.print_edge(e);
-		std::cout<<"\n";
+}
 
 
 
-	}*/
+
+
+
+
+
+
+
+
+int main(){
+	graph G;
+
+	list<node> A;
+	list<node> B;
+
+
+	create_complex_graph(1500, G);
+	bool flag = Is_Bipartite(G, A, B);
+	cout<<flag;
+
 
 
 	return 0;

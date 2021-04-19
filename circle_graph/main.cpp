@@ -4,14 +4,10 @@
 
 using namespace leda;
 
-int main(){
-	graph G;
-	
-	int test_N = 9;
+void create_circle_graph(int test_N, graph& G) {
 
 	node v[test_N];
 	node temp_node;
-	
 
 	// Creating first node
 	v[0] = G.new_node();
@@ -32,12 +28,26 @@ int main(){
 
 
 
-	edge e;
-	forall_edges(e,G) {
-		G.print_edge(e);
-		std::cout<<"\n";
+	// edge e;
+	// forall_edges(e,G) {
+	// 	G.print_edge(e);
+	// 	std::cout<<"\n";
 
-	}
+	// }
+}
+
+
+
+int main(){
+	graph G;
+	
+	list<node> A;
+	list<node> B;
+
+	create_circle_graph(10001, G);
+	bool flag = Is_Bipartite(G, A, B);
+	std::cout<<flag;
+	
 
 
 	return 0;
