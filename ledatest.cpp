@@ -2,6 +2,9 @@
 #include <iostream>
 #include "LEDA/core/queue.h"
 #include "LEDA/graph/basic_graph_alg.h"
+#include "LEDA/system/timer.h"
+#include "LEDA/graph/graph_gen.h"
+#include "rep/Algorithms/header/circle_graph.h"
 using namespace leda;
 
 node_array<int> my_BFS(const graph &G, node s, node_array<int> &dist, node_array<edge> &pred)
@@ -9,9 +12,9 @@ node_array<int> my_BFS(const graph &G, node s, node_array<int> &dist, node_array
     queue<node> Q;
     node_array<int> Colors(G, 0);
     node_array<bool> visited(G, false);
-    //node_array<edge> pred(G, NULL);
+
     int levelCounter = 0;
-    //node_array<int> dist(G, 0);
+
     Q.append(s);
     Q.append(NULL);
 
@@ -35,7 +38,7 @@ node_array<int> my_BFS(const graph &G, node s, node_array<int> &dist, node_array
             {
                 color = 2;
             }
-            // std::cout << "different level \n";
+
             levelCounter++;
             Q.append(NULL);
             if (Q.top() == NULL)
@@ -50,7 +53,7 @@ node_array<int> my_BFS(const graph &G, node s, node_array<int> &dist, node_array
         else
         {
             Colors[current_node] = color;
-            //visited[current_node] = true;
+
             dist[current_node] = levelCounter;
             forall_out_edges(e, current_node)
             {
@@ -59,8 +62,6 @@ node_array<int> my_BFS(const graph &G, node s, node_array<int> &dist, node_array
                     Q.append(G.target(e));
                     visited[G.target(e)] = true;
                     pred[G.target(e)] = e;
-                    //G.print_edge(e);
-                    // std::cout << "\n";
                 }
             }
         }
@@ -97,41 +98,41 @@ bool my_bipartite_checker(const graph &G, list<node> &V1, list<node> &V2)
 {
     node s = G.first_node();
     edge e;
-    //node_array<int> Colors(G, 0);
-    //node_array<bool> visited(G, false);
+
     node_array<edge> pred(G, NULL);
-    //int levelCounter = 0;
+
     node_array<int> dist(G, 0);
     node_array<int> ex = my_BFS(G, s, dist, pred);
-    node_array<edge> pred_from_s_to_u = pred;
-    node_array<int> dist_from_s_to_u = dist;
     node_array<bool> visited_ancestor(G, false);
-    //node_array<bool> reached(G, false);
+
     bool is_bipartite = true;
     forall_edges(e, G)
     {
-        //std::cout << "new node \n";
-        // std::cout << ex[G.source(e)] << "\n";
-        // std::cout << ex[G.target(e)] << "\n";
-        // std::cout << "--------\n";
-        if (ex[G.target(e)] == ex[G.source(e)])
+
+        if ((ex[G.target(e)] && ex[G.source(e)]) && (ex[G.target(e)] == ex[G.source(e)]))
         {
+            node temp = G.target(e);
             is_bipartite = false;
-            std::cout << "Starting\n";
-            node temp = G.target(e);//target;
-            while (temp != s)
+
+            while ((temp != s))
             {
+
                 visited_ancestor[temp] = true;
-                temp = G.source(pred[temp]);
+                if (pred[temp])
+                {
+                    temp = G.source(pred[temp]);
+                }
+                else
+                {
+                    std::cout << "pred[temp] does not exist";
+                }
             }
-            std::cout << "Done";
-            std::cout << "Marked preds for u";
             node source = G.source(e);
-            node lca;
+            node lca = s;
             temp = source;
-            while (temp != s)
+            while ((temp != s))
             {
-                if (visited_ancestor[temp] = false)
+                if ((visited_ancestor[temp] = false) && pred[temp])
                 {
                     temp = G.source(pred[temp]);
                 }
@@ -141,79 +142,126 @@ bool my_bipartite_checker(const graph &G, list<node> &V1, list<node> &V2)
                     break;
                 }
             }
-            std::cout << "Marked for v";
             temp = G.target(e);
-            G.print_node(G.target(e));
-            std::cout << "------>";
-            G.print_node(G.source(e));
-            while (temp != lca)
+            //V1.append(G.target(e));
+            V1.append(lca);
+
+            while ((temp != lca))
             {
-                G.print_node(G.target(pred[temp]));
-                std::cout << "------>";
-                G.print_node(G.source(pred[temp]));
-                temp = G.source(pred[temp]);
+
+                if (pred[temp])
+                {
+                    V1.append(temp);
+                    temp = G.source(pred[temp]);
+                }
+                else
+                {
+                    std::cout << "pred[temp] does not exist";
+                    break;
+                }
             }
+
             temp = source;
-            while (temp != lca)
+            while ((temp != lca))
             {
-                G.print_node(G.target(pred[temp]));
-                std::cout << "------>";
-                G.print_node(G.source(pred[temp]));
-                temp = G.source(pred[temp]);
+                if (pred[temp])
+                {
+                    V1.append(temp);
+                    temp = G.source(pred[temp]);
+                    
+                }
+                else
+                {
+                    std::cout << "pred[temp] does not exist";
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    if (is_bipartite)
+    {
+        node temp;
+        forall_nodes(temp, G)
+        {
+            if (ex[temp] == 2)
+            {
+                V1.push(temp);
+            }
+            else
+            {
+                V2.push(temp);
             }
         }
     }
+
     return is_bipartite;
 }
 int main()
 {
-
+    graph G;
+    edge e;
+    circle_graph(101,G);
+    forall_edges(e,G)
+    {
+        G.print_edge(e);
+        std::cout << "\n";
+    }
+    /*
     graph G;
     node center = G.new_node();
-    queue<node> Q;
-    int x;
     node one = G.new_node();
     node two = G.new_node();
     node three = G.new_node();
-    node four = G.new_node();
-    node five = G.new_node();
-
-    //node four = G.new_node();
-    //node five = G.new_node();
     G.new_edge(center, one);
-    G.new_edge(one, two);
-    G.new_edge(one, three);
-    //G.new_edge(two, three);
     G.new_edge(one, center);
-    G.new_edge(two, one);
-    G.new_edge(three, one);
-    //G.new_edge(three, two);
-    G.new_edge(two,four);
-    G.new_edge(four,two);
-    G.new_edge(three,five);
-    G.new_edge(five,three);
-    G.new_edge(four,five);
-    G.new_edge(five,four);
-    list<node> A;
-    list<node> B;
-    bool a = Is_Bipartite(G, A, B);
-    std::cout << a << "\n";
-    
-    // for (int i = 0; i < A.size(); i++)
-    // {
-    //     node a = A[i];
-    //     std::cout << G.print_node(a);
-    // }
+    G.new_edge(center, two);
+    G.new_edge(two, center);
+    G.new_edge(one, three);  
+    G.new_edge(three, one); 
+    G.new_edge(three,two);
+    G.new_edge(two,three);
 
-    // //std::cout << B << "\n";
-    // forall_nodes(one, G)
-    // {
-    //     std::cout << one << "\n";
-    // }
-    bool isBipartite = my_bipartite_checker(G, A, B);
-    std::cout << isBipartite;
-    // G.new_edge(center, one);
-    // G.new_edge(center, two);
+*/
+    leda::list<node> A;
+    leda::list<node> B;
+    leda::list<node> V1;
+    leda::list<node> V2;
+    timer a;
+    timer b;
+    a.start();
+    //bool isBipartite = Is_Bipartite(G, A, B);
+    a.stop();
+    //std::cout << isBipartite << "\n";
 
+    std::cout << "Time a:" << a.elapsed_time() << "\n";
+    std::cout << "\nLEDA A\n";
+    node iter;
+    forall(iter, A)
+    {
+        G.print_node(iter);
+    }
+    std::cout << "\nLEDA B\n";
+    forall(iter, B)
+    {
+        G.print_node(iter);
+    }
+    //std::cout << "created graph";
+    b.start();
+    bool isBipartite = my_bipartite_checker(G, V1, V2);
+    b.stop();
+    std::cout << "Time b:" << b.elapsed_time() << "\n";
+    std::cout << isBipartite << "\n";
+    std::cout << "\nMY A\n";
+    forall(iter, V1)
+    {
+        G.print_node(iter);
+    }
+    std::cout << "\nMY B\n";
+    forall(iter, V2)
+    {
+        G.print_node(iter);
+    }
+    std::cout << "\n";
     return 0;
 }
